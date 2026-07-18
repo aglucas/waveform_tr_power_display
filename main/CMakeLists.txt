@@ -2,18 +2,12 @@ idf_component_register(
     SRCS
         "main.c"
         "power_ui.c"
-        "power_source_espnow.c"
-        "power_source_i2c.c"
-        "power_source_can.c"
+        "rs485_rx.c"
         "triumph_logo.c"
         "lv_font_montserrat_bold_28.c"
         "lv_font_montserrat_bold_36.c"
         "lv_font_montserrat_bold_44.c"
     INCLUDE_DIRS "."
     REQUIRES
-        nvs_flash
         driver
-        esp_event
-        esp_timer
-        esp_wifi
         waveshare__esp32_p4_wifi6_touch_lcd_xc)

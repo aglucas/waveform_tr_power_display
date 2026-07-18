@@ -1,5 +1,8 @@
 CONFIG_IDF_TARGET="esp32p4"
-CONFIG_ESP_HOST_WIFI_ENABLED=y
+# (CONFIG_ESP_HOST_WIFI_ENABLED and the XIP-from-PSRAM=n workaround for the
+# precompiled WiFi libs are gone with ESP-NOW — telemetry now arrives over
+# RS-485, and no WiFi/esp-hosted stack is built at all. XIP is back on, same
+# as waveform_tr_display.)
 CONFIG_ESP32P4_SELECTS_REV_LESS_V3=y
 CONFIG_ESP32P4_REV_MIN_1=y
 CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
@@ -8,15 +11,16 @@ CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_COMPILER_OPTIMIZATION_PERF=y
 CONFIG_SPIRAM=y
 CONFIG_SPIRAM_SPEED_200M=y
-# XIP-from-PSRAM is incompatible with the precompiled WiFi libs: their
-# .rodata_wlog_* sections sit past _rodata_reserved_end, and XIP's
-# .ext_ram.dummy section then tries to move the linker location counter
-# backwards ("cannot move location counter backwards"). Keep it off so
-# instructions/rodata execute from the flash MMU cache instead.
-CONFIG_SPIRAM_XIP_FROM_PSRAM=n
+CONFIG_SPIRAM_XIP_FROM_PSRAM=y
 CONFIG_CACHE_L2_CACHE_256KB=y
 CONFIG_CACHE_L2_CACHE_LINE_128B=y
 CONFIG_ESP_MAIN_TASK_STACK_SIZE=10240
+
+# Task watchdog must REBOOT on a hang, not just print — same policy as
+# waveform_tr_display. The rs485_rx task subscribes itself to the TWDT.
+CONFIG_ESP_TASK_WDT_PANIC=y
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=5
+
 CONFIG_FREERTOS_HZ=1000
 CONFIG_FREERTOS_VTASKLIST_INCLUDE_COREID=y
 CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y

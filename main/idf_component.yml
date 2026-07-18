@@ -3,10 +3,3 @@ dependencies:
   lvgl/lvgl:
     version: "^9.*"
     public: true
-  # WiFi / ESP-NOW on the ESP32-P4 runs on the onboard ESP32-C6 co-processor
-  # over esp-hosted. esp_wifi_remote forwards the esp_wifi/esp_now API to it
-  # and pulls espressif/esp_hosted transitively. P4-only dependency.
-  espressif/esp_wifi_remote:
-    version: "*"
-    rules:
-      - if: "target == esp32p4"
