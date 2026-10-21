@@ -1,8 +1,6 @@
 CONFIG_IDF_TARGET="esp32p4"
-# (CONFIG_ESP_HOST_WIFI_ENABLED and the XIP-from-PSRAM=n workaround for the
-# precompiled WiFi libs are gone with ESP-NOW — telemetry now arrives over
-# RS-485, and no WiFi/esp-hosted stack is built at all. XIP is back on, same
-# as waveform_tr_display.)
+# (CONFIG_ESP_HOST_WIFI_ENABLED is gone with ESP-NOW — telemetry now arrives
+# over RS-485, and no WiFi/esp-hosted stack is built at all.)
 CONFIG_ESP32P4_SELECTS_REV_LESS_V3=y
 CONFIG_ESP32P4_REV_MIN_1=y
 CONFIG_ESPTOOLPY_FLASHMODE_QIO=y

@@ -14,33 +14,15 @@ central `kW` / `%` readout, matching the Qualia power gauge:
 - minor tick every 5 %, numeric label every 20 %
 - regen (negative kW) pins the needle at the 7 o'clock start
 
-## Swappable power source
+## Power source
 
-The power value is fed through a transport-agnostic interface
-(`main/power_source.h`):
+The power value arrives over RS-485 (`main/rs485_rx.c` / `rs485_rx.h`), as one
+field (`power_kw`) in the shared `telemetry_t` frame broadcast to every display
+on the bus — the same wire format and transport used by `waveform_tr_display`.
+This display also sends max-throttle commands back over the same pair.
 
-```c
-esp_err_t power_source_init(void);
-bool      power_source_get(float *power_kw);
-```
-
-Three backends implement it; exactly one is compiled, chosen by a single line in
-`main/power_source.h`:
-
-```c
-#define POWER_SOURCE  POWER_SOURCE_ESPNOW   // or _I2C, or _CAN
-```
-
-| Backend        | File                      | Status  | Notes |
-|----------------|---------------------------|---------|-------|
-| `POWER_SOURCE_ESPNOW` | `power_source_espnow.c` | **active default** | Exact drop-in for the Qualia: receives the sender's 5-byte `<fB` (power_kw, ready=0xA5) packet on channel 1. This board adopts the Qualia's MAC (`20:6E:F1:B8:E3:2C`) so the sender needs no changes. |
-| `POWER_SOURCE_CAN`    | `power_source_can.c`    | implemented | Self-contained: joins the CAN bus and reads `POWER_ID` (2011) from the ZombieVerter (node 3) over CANopen SDO, like `speed_test_driver`. Needs a CAN transceiver on `TX=GPIO19 / RX=GPIO18` (edit the `#define`s to match your wiring). |
-| `POWER_SOURCE_I2C`    | `power_source_i2c.c`    | scaffold | Master read of a framed power packet from the sender's I2C slave, reusing the waveform display's reframe+CRC. **Requires a sender-side change** — see the contract documented at the top of the file — because the current I2C telemetry packet carries no power field. |
-
-> The ESP-NOW link is the default per request, but note the P4 does WiFi through
-> its ESP32-C6 co-processor (esp-hosted), whose ESP-NOW build may not exactly
-> match the plain-ESP32 sender. If it proves flaky, switch to `_CAN` (fully
-> independent) or `_I2C` — the gauge code does not change.
+The older swappable ESP-NOW / I2C / CAN `power_source` backends have been
+removed; RS-485 is now the only transport.
 
 ## Build
 
